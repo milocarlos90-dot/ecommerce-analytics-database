@@ -10,7 +10,7 @@ renamed as (
     select
         cast(id as int64)                    as order_item_id,
         cast(order_id as int64)              as order_id,
-        cast(user_id as int64)               as user_id,
+        cast(user_id as int64)               as customer_id,
         cast(product_id as int64)            as product_id,
         cast(inventory_item_id as int64)     as inventory_item_id,
         cast(status as string)               as status,

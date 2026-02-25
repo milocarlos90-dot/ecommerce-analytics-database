@@ -1,45 +1,163 @@
+<!-- ===================================================== -->
+<!-- Pull Request Template                                 -->
+<!-- ===================================================== -->
+
 <!---
-Provide a short summary in the Title above. Examples of good PR titles:
-* "Feature: add so-and-so models"
-* "Fix: deduplicate such-and-such"
-* "Update: dbt version 0.14.0"
+Good PR title examples:
+* Feature: add intermediate models
+* Fix: deduplicate customer records
+* Update: refactor transformation logic
 -->
 
-## Description & motivation
-<!---
-Describe your changes, and why you're making them. Is this linked to an open
-issue, a Trello card, or another pull request? Link it here.
--->
+## Description & Motivation
+Briefly describe:
+- What changed
+- Why it was needed
+- Related ticket or issue
 
-## Screenshots:
-<!---
-Include a screenshot of the relevant section of the updated DAG. You can access
-your version of the DAG by running `dbt docs generate && dbt docs serve`.
--->
+---
 
-## Validation of models:
-<!---
-Include any output that confirms that the models do what is expected. This might
-be a link to an in-development dashboard in your BI tool, or a query that
-compares an existing model with a new one.
--->
+## Reviewer Guide
+Suggested review order:
 
-## Changes to existing models:
-<!---
-Include this section if you are changing any existing models. Link any related
-pull requests on your BI tool, or instructions for merge (e.g. whether old
-models should be dropped after merge, or whether a full-refresh run is required)
--->
+1. Review DAG screenshot.
+2. Review model SQL logic and grain.
+3. Review schema.yml tests & documentation.
+4. Review validation checks below.
 
-## Checklist:
-<!---
-This checklist is mostly useful as a reminder of small things that can easily be
-forgotten – it is meant as a helpful tool rather than hoops to jump through.
-Put an `x` in all the items that apply, make notes next to any that haven't been
-addressed, and remove any items that are not relevant to this PR.
--->
-- [ ] My pull request represents one logical piece of work.
-- [ ] My commits are related to the pull request and look clean.
-- [ ] I have materialized my models appropriately.
-- [ ] I have added appropriate tests and documentation to any new models.
-- [ ] I have updated the README file.
+---
+
+## Model Grain
+Declare grain for models introduced or modified.
+
+| Model | Grain |
+|------|------|
+| MODEL_NAME | DEFINE GRAIN |
+
+---
+
+## DAG Screenshot
+Run locally:
+
+dbt docs generate && dbt docs serve
+
+Attach updated DAG screenshot.
+
+---
+
+## Validation
+
+### dbt Validation
+- [ ] `dbt build` completed successfully.
+- [ ] All dbt tests passed (`unique`, `not_null`, `relationships`, `accepted_values`).
+
+### Data Validation Checks
+- [ ] Model grain validated.
+- [ ] Row counts validated before and after transformations.
+- [ ] No join fan-out introduced.
+- [ ] Null drift checked for enriched or derived columns.
+- [ ] Business logic validated where applicable (e.g. deduplication).
+
+---
+
+## Checklist
+
+### Scope & Version Control
+- [ ] PR represents one logical change.
+- [ ] Commits are clean and readable.
+
+### Modeling & Implementation
+- [ ] Models materialized appropriately.
+- [ ] Tests added or updated.
+- [ ] Documentation added or updated.
+
+### Documentation
+- [ ] README updated where required.
+
+---
+
+## Validation SQL (BigQuery)
+
+Replace placeholders before running:
+
+PROJECT_ID  
+DEV_DATASET  
+MODEL_TABLE  
+PRIMARY_KEY  
+BUSINESS_KEY  
+ORDER_COLUMN  
+UPSTREAM_DATASET  
+UPSTREAM_TABLE  
+COLUMN_NAME  
+
+```sql
+-- =====================================================
+-- GRAIN VALIDATION
+-- =====================================================
+select
+  count(*) as total_rows,
+  count(distinct PRIMARY_KEY) as distinct_keys
+from `PROJECT_ID.DEV_DATASET.MODEL_TABLE`;
+
+
+-- =====================================================
+-- JOIN FAN-OUT DETECTION
+-- =====================================================
+select
+  count(*) as total_rows,
+  count(distinct PRIMARY_KEY) as distinct_keys,
+  count(*) - count(distinct PRIMARY_KEY) as duplicate_rows
+from `PROJECT_ID.DEV_DATASET.MODEL_TABLE`;
+
+
+-- =====================================================
+-- ROW COUNT COMPARISON
+-- =====================================================
+select
+  (select count(*)
+   from `PROJECT_ID.UPSTREAM_DATASET.UPSTREAM_TABLE`) as upstream_rows,
+  (select count(*)
+   from `PROJECT_ID.DEV_DATASET.MODEL_TABLE`) as model_rows;
+
+
+-- =====================================================
+-- NULL DRIFT CHECK
+-- =====================================================
+select
+    'upstream' as layer,
+    countif(COLUMN_NAME is null) as null_count,
+    count(*) as total_rows,
+    safe_divide(countif(COLUMN_NAME is null), count(*)) as null_rate
+from `PROJECT_ID.UPSTREAM_DATASET.UPSTREAM_TABLE`
+
+union all
+
+select
+    'model',
+    countif(COLUMN_NAME is null),
+    count(*),
+    safe_divide(countif(COLUMN_NAME is null), count(*))
+from `PROJECT_ID.DEV_DATASET.MODEL_TABLE`;
+
+
+-- =====================================================
+-- DUPLICATE INVESTIGATION TEMPLATE
+-- =====================================================
+select
+    BUSINESS_KEY,
+    *,
+    row_number() over (
+        partition by BUSINESS_KEY
+        order by ORDER_COLUMN desc
+    ) as dedupe_rank,
+    count(*) over (
+        partition by BUSINESS_KEY
+    ) as duplicate_count
+from `PROJECT_ID.DEV_DATASET.MODEL_TABLE`
+where BUSINESS_KEY in (
+    select BUSINESS_KEY
+    from `PROJECT_ID.DEV_DATASET.MODEL_TABLE`
+    group by BUSINESS_KEY
+    having count(*) > 1
+)
+order by BUSINESS_KEY, dedupe_rank;
