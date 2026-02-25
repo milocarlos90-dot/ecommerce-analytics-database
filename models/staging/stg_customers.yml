@@ -2,56 +2,56 @@ version: 2
 
 models:
   - name: stg_customers
-    description: "Staging model for users from thelook_ecommerce source."
+    description: "Staging model for customers from thelook_ecommerce source."
 
     columns:
 
       - name: customer_id
-        description: "Primary key for users."
-        tests:
+        description: "Primary key for customers."
+        data_tests:
           - not_null
           - unique
 
       - name: email
-        description: "User email address."
-        tests:
+        description: "customer email address."
+        data_tests:
           - not_null
           - unique:
-              arguments: {}
+              arguments:
               severity: warn
 
 
       - name: first_name
-        description: "User first name."
-        tests:
+        description: "customer first name."
+        data_tests:
           - not_null
 
       - name: last_name
-        description: "User last name."
-        tests:
+        description: "customer last name."
+        data_tests:
           - not_null
 
       - name: age
-        description: "User age in years."
-        tests:
+        description: "customer age in years."
+        data_tests:
           - not_null
 
       - name: created_at
-        description: "Timestamp when the user was created."
-        tests:
+        description: "Timestamp when the customer was created."
+        data_tests:
           - not_null
 
       - name: gender
-        description: "User gender."
+        description: "customer gender."
 
       - name: country
-        description: "User country."
+        description: "customer country."
 
       - name: latitude
-        description: "User latitude."
+        description: "customer latitude."
 
       - name: longitude
-        description: "User longitude."
+        description: "customer longitude."
 
-      - name: user_geom
-        description: "Geographic location of the user as GEOGRAPHY type."
+      - name: customer_geom
+        description: "Geographic location of the customer as GEOGRAPHY type."

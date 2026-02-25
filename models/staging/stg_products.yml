@@ -8,18 +8,18 @@ models:
 
       - name: product_id
         description: "Primary key for products."
-        tests:
+        data_tests:
           - not_null
           - unique
 
       - name: cost
         description: "Internal cost of the product."
-        tests:
+        data_tests:
           - not_null
 
       - name: retail_price
         description: "Retail price of the product."
-        tests:
+        data_tests:
           - not_null
 
       - name: category
@@ -27,9 +27,9 @@ models:
 
       - name: product_name
         description: "Name of the product."
-        tests:
+        data_tests:
           - not_null:
-              arguments: {}
+              arguments:
               severity: warn 
          # TODO: Investigate null product values
 
@@ -41,13 +41,13 @@ models:
 
       - name: sku
         description: "Stock keeping unit identifier."
-        tests:
+        data_tests:
           - not_null
           - unique
 
       - name: distribution_center_id
         description: "Foreign key to distribution centers."
-        tests:
+        data_tests:
           - not_null
         # TODO: Add relationship test to stg_distribution_centers
         # once staging model for distribution centers is created 

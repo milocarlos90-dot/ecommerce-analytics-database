@@ -10,29 +10,29 @@ models:
     columns:
       - name: event_id
         description: Unique identifier for each event record.
-        tests:
+        data_tests:
           - not_null
           - unique
 
-      - name: user_id
+      - name: customer_id
         description: Identifier of the user associated with the event.
-        tests:
+        data_tests:
           - relationships:
               arguments:
                 to: ref('stg_users')
-                field: user_id
+                field: customer_id
 
       - name: sequence_number
         description: Sequential order of events within a browsing session.
 
       - name: session_id
         description: Unique identifier representing a single user session.
-        tests:
+        data_tests:
           - not_null
 
       - name: created_at
         description: Timestamp when the event occurred.
-        tests:
+        data_tests:
           - not_null
 
       - name: ip_address
@@ -58,5 +58,5 @@ models:
 
       - name: event_type
         description: Type of interaction performed by the user.
-        tests:
+        data_tests:
           - not_null

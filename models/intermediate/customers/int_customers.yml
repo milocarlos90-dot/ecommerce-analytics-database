@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: int_customers
+    description: "Int model for customers from stg_customers. Used for denormalisation and business transformation."
+
+    columns:
+
+      - name: customer_id
+        description: "Primary key for customer."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: email
+        description: "customer email address."
+        data_tests:
+          - not_null
+
+
+      - name: first_name
+        description: "customer first name."
+        data_tests:
+          - not_null
+
+      - name: last_name
+        description: "customer last name."
+        data_tests:
+          - not_null
+
+      - name: age
+        description: "customer age in years."
+        data_tests:
+          - not_null
+
+      - name: customer_created_at
+        description: "Timestamp when the customer was created."
+        data_tests:
+          - not_null
+
+      - name: gender
+        description: "customer gender."
+
+      - name: country_standardized
+        description: "Standardized customer country value used for analytics and reporting."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - Brazil
+                  - Japan
+                  - United States
+                  - Colombia
+                  - Spain
+                  - China
+                  - Australia
+                  - France
+                  - Germany
+                  - Belgium
+                  - South Korea
+                  - Poland
+                  - United Kingdom
+                  - Austria
+                severity: warn
+
+      - name: country
+        description: "Raw customer country value from source system. May contain inconsistent naming."
+
+      - name: latitude
+        description: "customer latitude."
+
+      - name: longitude
+        description: "customer longitude."
+
+      - name: country_geom
+        description: "Geographic location of the customer as GEOGRAPHY type."

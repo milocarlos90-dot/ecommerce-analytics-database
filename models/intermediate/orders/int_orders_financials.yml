@@ -1,0 +1,83 @@
+version: 2
+
+models:
+  - name: int_orders_financials
+    description: >
+      Intermediate model aggregating order item data to the order grain.
+      Each row represents one order with financial metrics derived from
+      stg_order_items.
+
+    columns:
+      - name: order_id
+        description: Unique identifier for the order.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+
+      - name: item_count
+        description: Total number of items included in the order.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "> 0"
+
+      - name: distinct_products
+        description: Number of distinct products purchased in the order.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "> 0"
+
+      - name: gross_revenue
+        description: Total value of all items ordered regardless of order status.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "> 0"
+
+      - name: completed_revenue
+        description: Revenue from completed orders representing successful sales.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+
+      - name: cancelled_revenue
+        description: Revenue associated with cancelled orders that did not convert to fulfilled sales.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+
+      - name: returned_revenue
+        description: Revenue linked to returned items after fulfillment.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+
+      - name: shipped_revenue
+        description: Revenue tied to items that have been shipped but may not yet be completed.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+
+      - name: processing_revenue
+        description: Revenue associated with orders currently in processing prior to shipment or completion.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"

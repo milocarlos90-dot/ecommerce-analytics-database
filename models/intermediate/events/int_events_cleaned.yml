@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  - name: int_events_cleaned
+    description: >
+      Intermediate model that standardizes and cleans raw event data.
+      Removes bot/test traffic, standardizes timestamps, parses URI metadata,
+      and normalizes event semantics. One row represents one user event.
+
+    columns:
+
+      - name: event_id
+        description: Unique identifier for each event.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: customer_id
+        description: Identifier of the customer performing the event.
+
+
+      - name: event_ts
+        description: Standardized event timestamp used for ordering and sessionization.
+        data_tests:
+          - not_null
+
+      - name: event_date
+        description: Calendar date derived from the event timestamp.
+        data_tests:
+          - not_null
+
+      - name: journey_session_id
+        description: >
+          Platform-generated session identifier representing a user's browsing journey.
+          Preserved from source events.
+
+      - name: event_type
+        description: Raw event type captured from the application event log.
+
+      - name: event_category
+        description: >
+          Normalized behavioral category derived from event_type
+          (browse, cart_interaction, conversion, order_management, other).
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - browse
+                  - cart_interaction
+                  - conversion
+                  - order_management
+                  - other
+
+      - name: page_category
+        description: Top-level page category extracted from URI path.
+
+      - name: product_slug
+        description: Product identifier parsed from product page URIs when available.
+
+      - name: browser
+        description: Browser used for the event after bot traffic filtering.
+
+      - name: traffic_source
+        description: Marketing or acquisition source of the event.

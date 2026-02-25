@@ -8,18 +8,18 @@ models:
 
       - name: order_id
         description: "Primary key for orders."
-        tests:
+        data_tests:
           - not_null
           - unique
 
-      - name: user_id
+      - name: customer_id
         description: "Foreign key to users."
-        tests:
+        data_tests:
           - not_null
           - relationships:
               arguments:
                 to: ref('stg_users')
-                field: user_id
+                field: customer_id
 
       - name: status
         description: "Order status."
@@ -29,7 +29,7 @@ models:
 
       - name: created_at
         description: "Timestamp when the order was created."
-        tests:
+        data_tests:
           - not_null
 
       - name: returned_at
@@ -43,5 +43,5 @@ models:
 
       - name: number_of_items
         description: "Number of items included in the order."
-        tests:
+        data_tests:
           - not_null
