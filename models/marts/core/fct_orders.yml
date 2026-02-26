@@ -47,7 +47,7 @@ models:
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: "order_created_at <= CURRENT_TIMESTAMP()"
+              expression: "<= CURRENT_TIMESTAMP()"
 
       - name: order_created_date
         description: "Date the order was created."
