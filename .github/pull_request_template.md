@@ -2,77 +2,64 @@
 <!-- Pull Request Template                                 -->
 <!-- ===================================================== -->
 
-<!---
-Good PR title examples:
-* Feature: add intermediate models
-* Fix: deduplicate customer records
-* Update: refactor transformation logic
--->
-
 ## Description & Motivation
+
 Briefly describe:
+
 - What changed
 - Why it was needed
-- Related ticket or issue
-
----
-
-## Reviewer Guide
-Suggested review order:
-
-1. Review DAG screenshot.
-2. Review model SQL logic and grain.
-3. Review schema.yml tests & documentation.
-4. Review validation checks below.
+- Related ticket or issue (if applicable)
 
 ---
 
 ## Model Grain
-Declare grain for models introduced or modified.
-
-| Model | Grain |
-|------|------|
-| MODEL_NAME | DEFINE GRAIN |
+Describe the grain of affected models.
+Example: `fct_orders → one row per order_id`
 
 ---
 
-## DAG Screenshot
-Run locally:
+## Screenshots
 
-dbt docs generate && dbt docs serve
-
-Attach updated DAG screenshot.
+Add DAG screenshots, lineage views, or relevant visuals if applicable.
 
 ---
 
-## Validation
+## Validation of Models
 
-### dbt Validation
-- [ ] `dbt build` completed successfully.
-- [ ] All dbt tests passed (`unique`, `not_null`, `relationships`, `accepted_values`).
+Describe validation performed:
+
+-
+-
+
+---
+
+## Changes to Existing Models
+
+- Breaking changes: Yes / No
+- Downstream impacts:
+- Migration considerations (if any):
+
+---
 
 ### Data Validation Checks
-- [ ] Model grain validated.
-- [ ] Row counts validated before and after transformations.
-- [ ] No join fan-out introduced.
-- [ ] Null drift checked for enriched or derived columns.
-- [ ] Business logic validated where applicable (e.g. deduplication).
+- [ ] Model grain validated
+- [ ] Row counts validated before and after transformations
+- [ ] No join fan-out introduced
+- [ ] Null drift checked for derived columns
+- [ ] Business logic validated where applicable
 
 ---
 
 ## Checklist
 
-### Scope & Version Control
-- [ ] PR represents one logical change.
-- [ ] Commits are clean and readable.
-
-### Modeling & Implementation
-- [ ] Models materialized appropriately.
-- [ ] Tests added or updated.
-- [ ] Documentation added or updated.
-
-### Documentation
-- [ ] README updated where required.
+- [ ] PR represents one logical piece of work
+- [ ] Commits are clean and readable
+- [ ] Models materialized appropriately
+- [ ] Tests added or updated
+- [ ] Documentation added or updated
+- [ ] README updated where required
+- [ ] `dbt build` completed successfully
+- [ ] All dbt tests passed (`unique`, `not_null`, `relationships`, etc.)
 
 ---
 

@@ -1,0 +1,198 @@
+version: 2
+
+models:
+  - name: dim_customers
+    config:
+      contract:
+        enforced: true
+    description: >
+      Customer dimension derived from int_customers providing a single,
+      analytics-ready record per customer. Includes identity, demographic,
+      location, geographic, and acquisition attributes. Serves as the
+      canonical customer entity for joining across core, product,
+      and marketing marts.
+
+    tests:
+      - dbt_utils.recency:
+          arguments:
+            datepart: day
+            field: customer_created_at
+            interval: 1
+  
+
+    columns:
+
+      # --------------------------------------------------
+      # Keys
+      # --------------------------------------------------
+
+      - name: customer_sk
+        description: "Surrogate key for the customer dimension."
+        data_type: string
+        data_tests:
+          - not_null
+          - unique
+
+      - name: customer_id
+        description: "Natural business key identifying the customer in the source system."
+        data_type: int64
+        data_tests:
+          - not_null
+          - unique
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false       
+          - relationships:
+              arguments:
+                to: ref('int_customers')
+                field: customer_id
+
+      # --------------------------------------------------
+      # Identity
+      # --------------------------------------------------
+
+      - name: first_name
+        description: "Customer first name."
+        data_type: string
+        data_tests:
+          - not_null
+
+      - name: last_name
+        description: "Customer last name."
+        data_type: string
+        data_tests:
+          - not_null
+
+      - name: full_name
+        description: "Concatenated customer full name."
+        data_type: string
+       
+      - name: email
+        description: "Customer email address."
+        data_type: string
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              arguments:
+                regex: '^[^@]+@[^@]+\\.[^@]+$'
+                severity: warn
+
+      # --------------------------------------------------
+      # Demographics
+      # --------------------------------------------------
+
+      - name: age
+        description: "Customer age in years."
+        data_type: integer
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "between 0 and 120"
+
+      - name: age_group
+        description: |
+          Customer age segmentation used for demographic analysis.
+
+          Categories:
+          - 18-24
+          - 25-34
+          - 35+
+        data_type: string
+
+      - name: gender
+        description: "Standardized customer gender derived from source system codes."
+        data_type: string
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - Male
+                  - Female
+              severity: warn
+
+      - name: customer_created_at
+        description: "Timestamp when the customer account was created."
+        data_type: timestamp
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:  
+                expression: "<= CURRENT_TIMESTAMP()"
+
+      # --------------------------------------------------
+      # Location
+      # --------------------------------------------------
+
+      - name: street_address
+        description: "Customer street address. Defaults to 'Unknown' when missing."
+        data_type: string
+
+      - name: postal_code
+        description: "Customer postal or ZIP code. Defaults to 'Unknown' when missing."
+        data_type: string
+
+      - name: city
+        description: "Customer city. Defaults to 'Unknown' when missing."
+        data_type: string
+        data_tests:
+          - dbt_utils.not_null_proportion:
+                arguments:
+                  at_least: 0.95
+
+      - name: state
+        description: "Customer state or region. Defaults to 'Unknown' when missing."
+        data_type: string
+
+      - name: country
+        description: "Raw customer country value from the source system."
+        data_type: string
+
+      - name: country_standardized
+        description: "Standardized customer country value used for analytics and reporting."
+        data_type: string
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - Brazil
+                  - Japan
+                  - United States
+                  - Colombia
+                  - Spain
+                  - China
+                  - Australia
+                  - France
+                  - Germany
+                  - Belgium
+                  - South Korea
+                  - Poland
+                  - United Kingdom
+                  - Austria
+              severity: warn
+
+      # --------------------------------------------------
+      # Geography
+      # --------------------------------------------------
+
+      - name: latitude
+        description: "Customer latitude."
+        data_type: float64
+
+      - name: longitude
+        description: "Customer longitude."
+        data_type: float64
+
+      - name: customer_geography
+        description: "Geographic location of the customer stored as GEOGRAPHY type."
+        data_type: geography
+
+      # --------------------------------------------------
+      # Acquisition
+      # --------------------------------------------------
+
+      - name: traffic_source
+        description: "Customer acquisition traffic source."
+        data_type: string
+            
