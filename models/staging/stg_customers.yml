@@ -18,7 +18,7 @@ models:
           - not_null
           - unique:
               arguments:
-              severity: warn
+                severity: warn
 
 
       - name: first_name
@@ -53,5 +53,5 @@ models:
       - name: longitude
         description: "customer longitude."
 
-      - name: customer_geom
+      - name: customer_geography
         description: "Geographic location of the customer as GEOGRAPHY type."

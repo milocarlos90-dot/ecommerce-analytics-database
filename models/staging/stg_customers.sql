@@ -23,7 +23,7 @@ renamed as (
         cast(longitude as float64)           as longitude,
         cast(traffic_source as string)       as traffic_source,
         cast(created_at as timestamp)        as created_at,
-        user_geom                            as user_geom
+        user_geom                            as customer_geography
     from source
 
 )
