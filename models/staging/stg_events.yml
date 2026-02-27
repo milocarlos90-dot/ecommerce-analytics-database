@@ -19,7 +19,7 @@ models:
         data_tests:
           - relationships:
               arguments:
-                to: ref('stg_users')
+                to: ref('stg_customers')
                 field: customer_id
 
       - name: sequence_number

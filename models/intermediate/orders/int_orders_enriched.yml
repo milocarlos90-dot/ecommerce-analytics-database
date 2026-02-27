@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: int_orders
+  - name: int_orders_enriched
     description: >
       Enriched orders model with standardized timestamps and lifecycle flags
       derived from order status.
