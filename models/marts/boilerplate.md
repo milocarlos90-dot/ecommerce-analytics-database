@@ -385,6 +385,26 @@ group by 1,2;
 
 ------------------------------------------------------------------------
 
+General checks:
+
+``` sql
+
+SELECT
+  DATE_TRUNC(DATE(order_created_date), WEEK) AS order_week,
+  COUNT(*) AS orders,
+  ROUND(SUM(gross_revenue) ,0) AS rev,
+  ROUND(SUM(gross_revenue) /  COUNT(*),0)  AS avg_rev,
+   COUNT(DISTINCT customer_sk) AS customers,
+     ROUND(AVG(item_count),2) AS avg_items_per_order
+FROM `ecommerce-analytics-training.dbt_prod_marts.fct_orders`
+WHERE DATE(order_created_date) BETWEEN '2025-02-15' AND '2026-03-03'
+GROUP BY order_week
+ORDER BY order_week;
+
+```
+
+------------------------------------------------------------------------
+
 # ⚡ Final Checklist
 
 1.  What is the grain?
