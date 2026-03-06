@@ -1,7 +1,24 @@
+{{ config(
+    materialized='incremental',
+    unique_key='event_id',
+    on_schema_change='append_new_columns',
+    partition_by={
+      "field": "event_date",
+      "data_type": "date"
+    }
+) }}
+
 with events as (
 
     select *
     from {{ ref('int_events_cleaned') }}
+
+    {% if is_incremental() %}
+        where event_ts >= (
+            select timestamp_sub(max(event_ts), interval 1 day)
+            from {{ this }}
+        )
+    {% endif %}
 
 ),
 
