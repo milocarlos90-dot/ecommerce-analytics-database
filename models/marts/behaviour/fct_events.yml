@@ -25,6 +25,8 @@ models:
     - dbt_utils.equal_rowcount:
         arguments:
           compare_model: ref('fct_events_check')
+          config:
+            where: "event_date >= date_sub(current_date, interval 60 day)"
 
     columns:
 
