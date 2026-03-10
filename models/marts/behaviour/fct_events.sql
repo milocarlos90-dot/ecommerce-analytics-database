@@ -26,6 +26,7 @@ with events as (
     {% if is_incremental() %}
     where event_date >= date_sub(current_date, interval {{ var('incremental_lookback_days') }} day)
     {% endif %}
+--changed to global lookback
 
 
 ),
