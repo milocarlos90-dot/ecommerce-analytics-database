@@ -28,6 +28,8 @@ models:
               arguments:
                 to: ref('fct_events')
                 field: journey_session_id
+                config:
+                  severity: warn
 
       - name: customer_id
         description: Natural key identifying the customer associated with the session.
